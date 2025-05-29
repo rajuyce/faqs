@@ -2,9 +2,9 @@
 
 #### EC2 & Networking
 1. **Your EC2 instance is unreachable — how do you troubleshoot?**
-   - Check security group rules, NACLs, route tables.
+   - Check security group rules, NACLs, and route tables.
    - Confirm instance state and system status checks.
-   - Verify correct subnet with a public IP or NAT for private subnets.
+   - Verify the correct subnet with a public IP or NAT for private subnets.
    - Validate DNS settings and SSH key.
 
 2. **How do you design a highly available EC2 setup?**
@@ -13,9 +13,9 @@
    - Configure health checks for automatic failover.
 
 3. **Your EC2 instance is running but the application is not accessible — what do you check?**
-   - Verify application/service is running.
-   - Check instance's security group and NACLs.
-   - Ensure correct listener/port is open.
+   - Verify that the application/service is running.
+   - Check the instance's security group and NACLs.
+   - Ensure the correct listener/port is open.
    - Validate route tables and DNS resolution.
 
 4. **How do you automate EC2 scaling?**
@@ -24,13 +24,10 @@
 
 5. **How do you recover a terminated or failed EC2 instance with minimal downtime?**
    - Use AMIs and EBS snapshots for quick recreation.
-   - Use Auto Scaling to automatically replace unhealthy instances.
+   - Use Auto Scaling to replace unhealthy instances automatically.
 
 6. **How do you automate patching of EC2 instances?**
    - Use AWS Systems Manager Patch Manager with maintenance windows.
-
-7. **Your EC2 instance in a private subnet cannot access the internet. Why?**
-   - Check for missing NAT Gateway or incorrect route table entries.
 
 8. **What kind of services require a VPC in AWS?**
    - EC2, RDS, ECS (EC2 launch type), EKS, ElastiCache, Redshift, and more.
@@ -55,9 +52,6 @@
 ### 🌐 AWS – Storage & CDN
 
 #### S3
-1. **You accidentally deleted critical data from S3. Can you recover it?**
-   - Only if versioning is enabled. You can restore previous versions.
-   - Without versioning, data is permanently deleted.
 
 2. **How do you make sure S3 data is not publicly accessible?**
    - Enable S3 Block Public Access at bucket/account level.
@@ -70,11 +64,11 @@
    - A resource-based policy attached to a bucket to define access permissions for principals.
 
 5. **An app suddenly loses access to S3. How do you debug IAM roles and policies?**
-   - Check IAM policy simulator.
+   - Check the IAM policy simulator.
    - Validate trust relationships and resource policies.
 
 6. **How do you serve a static website with HTTPS using S3?**
-   - Host site in S3, use CloudFront with custom domain and ACM-issued SSL certificate.
+   - Host site in S3, use CloudFront with a custom domain and ACM-issued SSL certificate.
 
 ---
 
@@ -95,7 +89,7 @@
    - Security Groups, NACLs, AWS WAF, AWS Shield, Network Firewall, PrivateLink.
 
 5. **What are network firewalls in AWS and how do you use them?**
-   - AWS Network Firewall is a managed service to deploy stateful inspection rules at VPC level.
+   - AWS Network Firewall is a managed service to deploy stateful inspection rules at the VPC level.
 
 6. **How do you prevent a Lambda function from accessing the internet?**
    - Deploy it in a private subnet without a NAT Gateway or Internet Gateway.
@@ -137,7 +131,7 @@
 
 2. **How do you set up infrastructure as code with Terraform or CloudFormation?**
    - Write .tf (Terraform) or .yaml/.json (CloudFormation) templates.
-   - Use modules/stacks, apply changes via CI/CD pipelines.
+   - Use modules/stacks, and apply changes via CI/CD pipelines.
 
 3. **What is Amazon EventBridge and how is it used in automation?**
    - Event bus service for routing events. Used to trigger Lambda, Step Functions, etc.
@@ -153,7 +147,7 @@
 
 ---
 
-### 🧠 AWS – AI & ML Services
+###  AWS – AI & ML Services
 1. **What generative AI tools are available in AWS (e.g., Bedrock, SageMaker)?**
    - Bedrock for foundation models from Anthropic, Meta, etc.
    - SageMaker for custom ML models and pipelines.
@@ -166,11 +160,11 @@
 
 ### 🏗️ AWS – Landing Zone
 1. **What is AWS Landing Zone and what are its key components?**
-   - Pre-configured baseline with multi-account architecture, guardrails, logging, security controls.
+   - Pre-configured baseline with multi-account architecture, guardrails, logging, and security controls.
 
 2. **What are the best practices for setting up a multi-account architecture using Landing Zone?**
    - Separate accounts by workload (e.g., security, shared services, dev/prod).
-   - Enforce SCPs, centralize logging and monitoring.
+   - Enforce SCPs, and centralize logging and monitoring.
 
 3. **How do you implement guardrails in an AWS Landing Zone?**
    - Use SCPs, AWS Config rules, and AWS Config conformance packs.
@@ -204,7 +198,7 @@
    - Account provisioning, guardrail updates, logging configurations.
 
 6. **What are the common limitations or challenges with AWS Control Tower?**
-   - Limited customization, regional restrictions, dependency on supported services.
+   - Limited customization, regional restrictions, and dependency on supported services.
 
 ---
 
@@ -216,7 +210,7 @@
    - Use AWS Service Catalog with input parameters for OU, VPC, email, etc.
 
 3. **How do you enforce standard security baselines using Account Factory?**
-   - Baselines are applied automatically via Control Tower.
+   - Baselines are applied automatically via the Control Tower.
 
 4. **How do you customize networking and IAM roles during account provisioning in Account Factory?**
    - Modify Account Factory templates and use customization pipelines.
