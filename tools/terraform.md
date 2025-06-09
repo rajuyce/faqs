@@ -1,119 +1,202 @@
-### ✅ Terraform Interview Questions & Answers
+# 📘 Terraform Interview Questions & Answers
 
----
+## ⚙️ Terraform Basics & Core Workflow
 
-### ⚙️ Terraform Basics & Core Workflow
+### What happens during `terraform plan` and `terraform apply`?
+- **`terraform plan`**: Compares the current infrastructure with the desired configuration and shows a preview of the changes that will be made.
+  - *Example*: If you add a new S3 bucket in the configuration, `terraform plan` shows `+` for creating that bucket.
+- **`terraform apply`**: Executes the plan and applies the changes to reach the desired state.
 
-1. **What happens during `terraform plan` and `terraform apply`?**  
-   - `terraform plan`: Shows the execution plan by comparing current state with desired config.  
-   - `terraform apply`: Applies the planned changes to reach desired state.
+### What are the different phases in Terraform?
+1. **Init**: Initializes backend and providers.
+2. **Validate**: Checks configuration syntax and internal consistency.
+3. **Plan**: Determines what actions are needed to achieve the desired state.
+4. **Apply**: Makes changes to infrastructure.
+5. **Destroy**: Tears down infrastructure managed by Terraform.
 
-2. **What are the different phases in Terraform?**  
-   - Init → Validate → Plan → Apply → Destroy.
+### What is the `.terraform` directory used for?
+- Stores provider plugins, module caches, backend settings, and state lock information.
 
-3. **What is the `.terraform` directory used for?**  
-   - Stores module and provider binaries, backend config, and state lock info.
+### What happens if you manually change a resource outside Terraform?
+- Terraform detects the drift during the next `terraform plan` and shows that the current state differs from configuration. It may propose to overwrite manual changes.
 
-4. **What happens if you manually change a resource outside Terraform?**  
-   - Terraform will detect drift during the next plan and may attempt to overwrite the change.
+### How do you roll back infrastructure changes applied using Terraform?
+- There is no native rollback.
+- Revert `.tf` configuration using version control and re-apply.
+- In critical setups, use snapshots or resource backups manually.
 
-5. **How do you roll back infrastructure changes applied using Terraform?**  
-   - Use version control to revert the code and apply again. No native rollback exists.
+### How do you prevent Terraform drift?
+- Use Terraform exclusively for all infrastructure changes.
+- Run `terraform plan` regularly.
+- Implement CI pipelines with Terraform plan and apply stages.
+- Use `terraform state` commands to inspect or fix drift.
 
-6. **How do you prevent Terraform drift?**  
-   - Enforce IaC-only changes, regularly run `terraform plan`, use `terraform state` commands.
+## 🧮 Variables & Expressions
 
----
+### What are the different kinds of variables in Terraform?
+- **Input variables**: Used to pass dynamic values.
+- **Output values**: Expose values after deployment.
+- **Local values**: Used for simplified logic.
+- **Environment variables**: Used to override input variables.
 
-### 🧮 Variables & Expressions
+### What are local variables, and why are they useful?
+- Local values simplify expressions and reduce repetition.
+```hcl
+locals {
+  instance_type = "t3.micro"
+}
+```
 
-7. **What are the different kinds of variables in Terraform?**  
-   - Input variables, output values, local values, environment variables.
+### What are dynamic blocks in Terraform?
+- Used to generate nested blocks conditionally or in loops.
+```hcl
+resource "aws_security_group" "example" {
+  dynamic "ingress" {
+    for_each = var.rules
+    content {
+      from_port = ingress.value.from
+      to_port   = ingress.value.to
+      protocol  = ingress.value.protocol
+    }
+  }
+}
+```
 
-8. **What are local variables, and why are they useful?**  
-   - Used to simplify expressions or avoid repeating complex logic.
+### What is `null` in Terraform and where would you use it?
+- Represents an unset or optional value.
+- If a value is `null`, the attribute is omitted in the resource.
 
-9. **What are dynamic blocks in Terraform?**  
-   - Allow conditional and looped generation of nested blocks.
+### What is the difference between a map and an object in Terraform?
+- **Map**: Key-value pairs with uniform value types.
+- **Object**: Key-value pairs with explicitly defined types per key.
+```hcl
+variable "tags" {
+  type = map(string)
+}
 
-10. **What is `null` in Terraform and where would you use it?**  
-    - Used to omit arguments dynamically. If a value is `null`, Terraform acts as if it's not set.
+variable "person" {
+  type = object({
+    name = string
+    age  = number
+  })
+}
+```
 
-11. **What is the difference between a map and an object in Terraform?**  
-    - Map: key-value pairs with uniform value types.  
-    - Object: structured key-value pairs with defined types per key.
+## 📦 Modules & Reusability
 
----
+### What are Terraform modules and 3 use cases for using them?
+- Modules are containers for multiple resources.
+#### Use cases:
+1. Reuse infrastructure patterns (e.g., VPC, IAM).
+2. Logical grouping (e.g., RDS module).
+3. Enforce organization-wide standards.
 
-### 📦 Modules & Reusability
+### How do you pass outputs between modules?
+- Define output in the source module:
+```hcl
+output "vpc_id" {
+  value = aws_vpc.main.id
+}
+```
+- Reference it in the parent module:
+```hcl
+module.vpc.vpc_id
+```
 
-12. **What are Terraform modules and 3 use cases for using them?**  
-    - A module is a container for resources. Use cases:  
-      - Reuse common infra patterns  
-      - Logical grouping of related resources  
-      - Enforcing organization-wide standards
+### Which is best practice: having a Terraform module for S3 and lifecycle rules together or separately?
+- Prefer separate modules for better reusability, testing, and separation of concerns.
 
-13. **How do you pass outputs between modules?**  
-    - Use `output` from source module and reference via `module.source_module.output_name`
+## 🧪 Environments & Workspaces
 
-14. **Which is best practice: having a Terraform module for S3 and lifecycle rules together or separately?**  
-    - Separate modules for better separation of concerns and reuse.
+### What are Terraform workspaces and when would you use them?
+- Workspaces allow isolated state files.
+- Use for managing multiple environments (dev/staging/prod).
+```bash
+terraform workspace new dev
+terraform workspace select prod
+```
 
----
+### How do you manage multiple environments using Terraform?
+- Strategies:
+  - Named workspaces
+  - Directory per environment (e.g., `env/dev/main.tf`)
+  - Terragrunt with folder hierarchy
 
-### 🧪 Environments & Workspaces
+## 📂 State Management & Backends
 
-15. **What are Terraform workspaces and when would you use them?**  
-    - Isolated state per workspace; used for managing different environments like dev/stage/prod.
+### What are the different kinds of backends in Terraform?
+- **Local**: Stores state locally (default).
+- **Remote**:
+  - AWS S3 (with DynamoDB lock)
+  - Azure Blob Storage
+  - Google Cloud Storage
+- **Enhanced**:
+  - Terraform Cloud/Enterprise
 
-16. **How do you manage multiple environments using Terraform?**  
-    - Options:  
-      - Separate workspaces  
-      - Directory structure per env  
-      - Use of Terragrunt
+### What is a backend in Terraform, and how do you configure it securely?
+- Backend controls where state is stored.
+- For secure S3 backend:
+```hcl
+backend "s3" {
+  bucket         = "my-terraform-state"
+  key            = "global/s3/terraform.tfstate"
+  region         = "us-east-1"
+  encrypt        = true
+  dynamodb_table = "terraform-locks"
+}
+```
+- Use IAM roles/policies to restrict access.
 
----
+### How do you manage state in a team environment?
+- Use remote backend with state locking (e.g., S3 + DynamoDB).
+- Enable versioning.
+- Avoid local state and manual updates.
 
-### 📂 State Management & Backends
+### How do you recover from a corrupted state file?
+- Recover from versioned backup (e.g., S3).
+- Use `terraform state pull` and manual editing if necessary.
+- `terraform import` can recreate missing resources into state.
 
-17. **What are the different kinds of backends in Terraform?**  
-    - Local, remote (S3, Azure, GCS, etc.), enhanced (Terraform Cloud/Enterprise).
+## 🔐 Credentials & Secrets Management
 
-18. **What is a backend in Terraform, and how do you configure it securely?**  
-    - Defines how state is stored. Use encryption (e.g., S3 + KMS) and restrict access with IAM.
+### How do you supply credentials in Terraform?
+- Via:
+  - AWS environment variables
+  - Shared credentials file (`~/.aws/credentials`)
+  - AWS profiles
+  - Vault integration
 
-19. **How do you manage state in a team environment?**  
-    - Use remote backend with locking (e.g., S3 + DynamoDB), and versioning.
+### How do you prevent secrets from being stored in the state file?
+- Avoid inline secrets.
+- Use data sources for fetching secrets at runtime.
+- Use external secret managers (e.g., Vault, AWS Secrets Manager).
 
-20. **How do you recover from a corrupted state file?**  
-    - Use state file backups, state versioning (e.g., in S3), or manually fix using `terraform state`.
+### How does Terraform integrate with AWS Secrets Manager or Vault?
+```hcl
+data "aws_secretsmanager_secret_version" "example" {
+  secret_id = "my-secret"
+}
 
----
+resource "aws_instance" "example" {
+  user_data = data.aws_secretsmanager_secret_version.example.secret_string
+}
+```
 
-### 🔐 Credentials & Secrets Management
+## 🧰 Tools & Ecosystem
 
-21. **How do you supply credentials in Terraform?**  
-    - Environment variables, AWS CLI profile, shared credentials file, or Vault integration.
+### What is Terragrunt?
+- A wrapper for Terraform that provides:
+  - DRY configuration
+  - Dependency management
+  - Environment hierarchy
+  - Automatic backend configuration
 
-22. **How do you prevent secrets from being stored in the state file?**  
-    - Avoid hardcoding secrets. Use data sources or external secrets managers.
-
-23. **How does Terraform integrate with AWS Secrets Manager or Vault?**  
-    - Use `data` blocks to read secrets dynamically at runtime.
-
----
-
-### 🧰 Tools & Ecosystem
-
-24. **What is Terragrunt?**  
-    - Wrapper for Terraform that adds features like DRY code, dependency management, and automation.
-
-25. **What is the difference between open-source Terraform and Terraform Enterprise?**  
-    - Enterprise provides UI, team management, policies (Sentinel), audit logging, and private registry.
-
----
-
-### 🧼 Resource Management & Refactoring
-
-26. **I want to change the name of a resource and avoid creating a new one — how do I achieve this?**  
-    - Use `terraform state mv` to rename the resource in the state before applying the config change.
+### What is the difference between open-source Terraform and Terraform Enterprise?
+- **Terraform Open Source**:
+  - CLI based
+  - Community support
+- **Terraform Enterprise**:
+  - UI and API-based workflows
+  - RBAC and team management
+  - Sentinel policies for governance
+  - Integrated state management and VCS support
