@@ -1,5 +1,12 @@
-Linux Infrastructure & Troubleshooting Guide
-### Case 1: High Load Average on Linux Server
+### 1. Operating system, basic networking and scripting
+#### a) While managing Linux-based servers, you come across an 8-core box taking very long to establish a connection (via secure shell). Once in, you notice the following:
+```
+load average: 99.53, 97.19, 91.12
+```
+- Explain what the above means
+- Speculate what could be causing it (give examples)
+- Theorise how you would solve one of the cases you’ve just described, hence returning the box to normal operation
+
 **Load average: 99.53, 97.19, 91.12** means:
 - These are the 1, 5, and 15-minute averages of the number of processes waiting to run.
 - On an **8-core server**, anything above 8 is "overloaded".
@@ -19,11 +26,12 @@ Linux Infrastructure & Troubleshooting Guide
  - Add systemd limits (`CPUQuota`, `MemoryLimit`)
  - Use `nice`/`cgroups` to restrict bad actors
 ---
-### Case 2: getaddrinfo Error
-**Error:**
+#### b) You have created a lightweight script for pushing metrics into a centralised time- series database. Testing it locally on your laptop, everything works fine. Running it on a server, however, throws back the following error message:
 ```
 getaddrinfo for my-cool-metrics.server.internal failed: Name or service not known
 ```
+- Explain what the error message is telling you
+- The endpoint is correct, propose a solution to making your script work
 **Explanation:**
 - The script is trying to resolve a DNS name.
 - It can't find **`my-cool-metrics.server.internal`** in DNS or `/etc/hosts`.
@@ -37,8 +45,8 @@ getaddrinfo for my-cool-metrics.server.internal failed: Name or service not know
  - Has access to the correct resolver
 5. Ensure no proxy/DNS split issues.
 ---
-### Case 3: Sporadic 502s from NGINX
-Linux Infrastructure & Troubleshooting Guide
+#### c) A web server running a standard reverse-proxy setup (nginx + backend running on the same box, communicating over TCP) sporadically returns 502 response codes. CPU load, load average, memory utilisation, disk space and I/O metrics are within standard operational ranges. The multi-threaded, back-end application, running on the server, is self-su􏰀icient (does not require external services to operate) and is capable of reliably handling up to 1000 qps. Assuming the server is on the open internet and is a known authority for randomly providing baby names, speculate why nginx could be returning 502 responses.
+
 **Scenario:**
 - Backend app & NGINX on same box.
 - Backend can handle 1000 qps.
@@ -63,7 +71,7 @@ Linux Infrastructure & Troubleshooting Guide
 - Use `netstat -plant | grep :<port>` or `ss -ltnp`
 - Increase `worker_connections`, `ulimit -n`
 ---
-### Case 4: Sync Environment Variables Every 10 Seconds
+#### d) You need to create an automated approach to making centrally-managed (remote service) environment variables available to a group of Linux-based servers (at the shell level). The allowed synchronisation drift is 10 seconds. Propose a solution using BASH, Python or any scripting language of your choice. Assuming the centralised storage o􏰀ers a simple HTTP endpoint (basic authentication, takes only variable names as parameters - comma-separated string, takes 2 seconds to respond), provide a simple script for retrieving the values and pulling them to the servers. Describe your solution’s workflow.
 **Goal:** Sync env vars from a remote HTTP endpoint to Linux servers
 **Approach:** Use Python + systemd timer
 **Python Script (`env_sync.py`)**
@@ -95,7 +103,7 @@ except Exception as e:
 - Use `systemd` timer every 10s or cron with `sleep` intervals.
 - Add to `/etc/profile.d/` to make available to all shells.
 ---
-### Linux Network Layout - 3 Tier Architecture
+#### e) You’re setting up a small cluster of servers (3-tier deployment, 4 servers - 1:2:1) and you need to decide how you would configure their networking. Provide a simple diagram to illustrate how you would achieve this (assume you’re not working with physical servers), indicating connectivity links and assigned IP addresses.
 **Architecture:**
 - Frontend: `10.0.0.10`
 - App Servers: `10.0.0.21`, `10.0.0.22`
@@ -106,9 +114,9 @@ Frontend App Servers DB
 ---
 
 
-## 2. Amazon Web Services
+### 2. Amazon Web Services
 
-### a) AWS Networking Topology for Multi-Account Setup
+#### a) AWS Networking Topology for Multi-Account Setup
 
 #### ✅ Proposed Networking Topology: Star Topology (Hub-and-Spoke Model)
 
@@ -148,7 +156,7 @@ Frontend App Servers DB
 
 ---
 
-### b) IAM-Based Access Management
+#### b) IAM-Based Access Management
 
 #### ✅ Centralized Access via AWS IAM Identity Center (AWS SSO)
 
@@ -185,7 +193,7 @@ Frontend App Servers DB
 
 ---
 
-### c) Managing Service Permissions (Cross-Account)
+#### c) Managing Service Permissions (Cross-Account)
 
 #### ✅ Strategy: IAM Role-Based with Cross-Account AssumeRole
 
