@@ -45,7 +45,7 @@ getaddrinfo for my-cool-metrics.server.internal failed: Name or service not know
  - Has access to the correct resolver
 5. Ensure no proxy/DNS split issues.
 ---
-#### c) A web server running a standard reverse-proxy setup (nginx + backend running on the same box, communicating over TCP) sporadically returns 502 response codes. CPU load, load average, memory utilisation, disk space and I/O metrics are within standard operational ranges. The multi-threaded, back-end application, running on the server, is self-su􏰀icient (does not require external services to operate) and is capable of reliably handling up to 1000 qps. Assuming the server is on the open internet and is a known authority for randomly providing baby names, speculate why nginx could be returning 502 responses.
+#### c) A web server running a standard reverse-proxy setup (nginx + backend running on the same box, communicating over TCP) sporadically returns 502 response codes. CPU load, load average, memory utilisation, disk space and I/O metrics are within standard operational ranges. The multi-threaded, back-end application, running on the server, is self-sufficient (does not require external services to operate) and is capable of reliably handling up to 1000 qps. Assuming the server is on the open internet and is a known authority for randomly providing baby names, speculate why nginx could be returning 502 responses.
 
 **Scenario:**
 - Backend app & NGINX on same box.
@@ -71,7 +71,7 @@ getaddrinfo for my-cool-metrics.server.internal failed: Name or service not know
 - Use `netstat -plant | grep :<port>` or `ss -ltnp`
 - Increase `worker_connections`, `ulimit -n`
 ---
-#### d) You need to create an automated approach to making centrally-managed (remote service) environment variables available to a group of Linux-based servers (at the shell level). The allowed synchronisation drift is 10 seconds. Propose a solution using BASH, Python or any scripting language of your choice. Assuming the centralised storage o􏰀ers a simple HTTP endpoint (basic authentication, takes only variable names as parameters - comma-separated string, takes 2 seconds to respond), provide a simple script for retrieving the values and pulling them to the servers. Describe your solution’s workflow.
+#### d) You need to create an automated approach to making centrally-managed (remote service) environment variables available to a group of Linux-based servers (at the shell level). The allowed synchronisation drift is 10 seconds. Propose a solution using BASH, Python or any scripting language of your choice. Assuming the centralised storage offers a simple HTTP endpoint (basic authentication, takes only variable names as parameters - comma-separated string, takes 2 seconds to respond), provide a simple script for retrieving the values and pulling them to the servers. Describe your solution’s workflow.
 **Goal:** Sync env vars from a remote HTTP endpoint to Linux servers
 **Approach:** Use Python + systemd timer
 **Python Script (`env_sync.py`)**
@@ -116,9 +116,10 @@ Frontend App Servers DB
 
 ### 2. Amazon Web Services
 
-#### a) AWS Networking Topology for Multi-Account Setup
+#### You’re running a multi-account setup (star topology). Each account serves a different area of the Software Development Lifecycle (development, testing, staging, production, monitoring, etc.). Only one of them takes any inbound traffic from the open internet.
+#### a) Assuming you’ve got the task of organising the AWS accounts from scratch, what kind of networking topology would you use - as suggested above or different? Explain how you would solve the cross-account connectivity challenge and why (give examples to support your arguments). Provide details on the individual account setup (hint: go with one VPC per account), including networking configuration, indication of which account can “speak” to which of the rest and how you would control the traffic flow (hint: don’t go deeper than VPC and its directly related components, e.g. subnets, routing tables, security groups, etc.)
 
-#### ✅ Proposed Networking Topology: Star Topology (Hub-and-Spoke Model)
+#### Proposed Networking Topology: Star Topology (Hub-and-Spoke Model)
 
 **Why Star Topology?**
 - Centralizes shared services (e.g., NAT, DNS, logging).
@@ -137,7 +138,7 @@ Frontend App Servers DB
 | Production     | 10.4.0.0/16   | Live workloads             | ✅ (ingress only)| Staging, Monitoring |
 | Monitoring     | 10.5.0.0/16   | Monitoring & logging       | ❌               | All                 |
 
-#### 🔄 Cross-Account Connectivity: AWS Transit Gateway (Preferred)
+#### Cross-Account Connectivity: AWS Transit Gateway (Preferred)
 
 - TGW hosted in Network Account.
 - VPCs attach to TGW.
@@ -150,15 +151,15 @@ Frontend App Servers DB
 - **Security Groups**: Use cross-account SG referencing for precise control.
 - **NACLs**: Optional, use only if strict control needed.
 
-#### 🌐 Internet Exposure
+#### Internet Exposure
 - Only Production has ALB/NLB in a public subnet.
 - Others use centralized NAT via TGW.
 
 ---
 
-#### b) IAM-Based Access Management
+#### b) There are multiple groups of employees, requiring different levels of access permissions to each of the accounts. How would you architect an IAM-based solution to grant and manage these? Explain the benefits of the suggested solution and list any potential drawbacks or considerations.
 
-#### ✅ Centralized Access via AWS IAM Identity Center (AWS SSO)
+#### Centralized Access via AWS IAM Identity Center (AWS SSO)
 
 **Key Components:**
 - AWS Organizations: Centralized account and OU management.
@@ -176,7 +177,7 @@ Frontend App Servers DB
 | Monitoring Team | All                    | ReadOnly            |
 | SecOps          | All                    | SecurityAudit       |
 
-#### ✅ Benefits
+#### Benefits
 
 - Centralized control
 - Scalable and auditable
@@ -184,7 +185,7 @@ Frontend App Servers DB
 - Temporary, session-based access
 - Compatible with SAML/SSO
 
-#### ⚠️ Drawbacks
+####  Drawbacks
 
 - Regional IAM Identity Center
 - CLI requires `aws configure sso`
@@ -193,15 +194,15 @@ Frontend App Servers DB
 
 ---
 
-#### c) Managing Service Permissions (Cross-Account)
+#### c) All in-house-built services deployed to the environments need to use local (to their host AWS account) AWS resources, while some of them also need to be able to access AWS resources from other AWS accounts. Explain how you would manage the permissions, available to each of the services (regardless of the platform they’re running on - could be EC2, ECS, EKS, Fargate, etc.) and how you would authorise access to the in-house-built services/applications.
 
-#### ✅ Strategy: IAM Role-Based with Cross-Account AssumeRole
+#### Strategy: IAM Role-Based with Cross-Account AssumeRole
 
 - Services use **IAM roles** (EC2 instance profile, EKS IRSA, Fargate task roles).
 - For cross-account, assume IAM roles in target accounts.
 - Use **STS AssumeRole**, trust policies, and resource policies.
 
-#### 🔁 Flow Example
+#### Flow Example
 
 ```
 Dev Account (1111)
@@ -212,13 +213,13 @@ Monitoring Account (2222)
 └── cross-reader-role trusts service-a-role@1111
 ```
 
-#### 🔐 IAM Policies
+#### IAM Policies
 
 - Source role allows `sts:AssumeRole`
 - Target role trusts source role
 - Temporary credentials used
 
-#### ✅ Platform-Specific
+#### Platform-Specific
 
 | Platform | Role Attachment Method          |
 |----------|---------------------------------|
@@ -228,14 +229,14 @@ Monitoring Account (2222)
 | EKS      | IRSA (IAM Role for Service Acct)|
 | Lambda   | Execution Role                  |
 
-#### ✅ Benefits
+#### Benefits
 
 - Secure, temporary credentials
 - Least privilege by design
 - Full audit via CloudTrail
 - Platform-agnostic
 
-#### ⚠️ Considerations
+#### Considerations
 
 - STS latency
 - Role sprawl
@@ -243,15 +244,13 @@ Monitoring Account (2222)
 - Regular auditing needed
 
 
-# Containerisation
-
 ## 3. Containerisation
 
 You’ve got the task of putting together a Docker-based container image, which would be used as the foundation of a broad variety of microservices. It has to be streamlined, reliable and multi-architecture compatible (for the sake of simplicity, needs to run on x86_64 and ARM64).
 
 ---
 
-### a) Plan of Approach, Requirement Gathering & Stakeholder Nomination
+### a) Propose a plan how you would approach the task, gather initial requirements and nominate stakeholders
 
 #### 🧭 Understand the Objective
 - Goal: Create a general-purpose, production-grade Docker base image that:
@@ -310,7 +309,7 @@ You’ve got the task of putting together a Docker-based container image, which 
 
 ---
 
-### b) Dockerfile Example (PHP 8 with PostgreSQL and Redis)
+### b) Provide an example build file (Dockerfile), which would create a container image for a standard PHP8-based application, which would in turn be communicating with a PostgreSQL relational database and a Redis key-value store.
 
 ```Dockerfile
 FROM --platform=$BUILDPLATFORM php:8.2-fpm-slim AS base
@@ -342,7 +341,7 @@ docker buildx build --platform linux/amd64,linux/arm64 -t your-registry/php8-app
 
 ---
 
-### c) Build, Store, Manage, Maintain Strategy
+### c) Given the container image would be used in a variety of environments (locally by developers, for automated testing, beta deployments, etc.), explain how you would build, store, manage and maintain it (hint: remember it would be pulled from different locations). Provide a diagram to visualise the proposed workflow.
 
 **1. Build Strategy (Multi-Arch, CI/CD):**
 - Triggered by push/PR/semantic version tags
