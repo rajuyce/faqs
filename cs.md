@@ -145,7 +145,7 @@ Frontend App Servers DB
 - TGW route tables define who can talk to whom.
 - Example: Dev → Monitoring allowed; Dev → Prod blocked.
 
-#### 🔧 Network Configuration
+####  Network Configuration
 - **Subnets**: Public for ingress (only in Prod), private for app workloads.
 - **Routing Tables**: Private subnets route to TGW or NAT in Network VPC.
 - **Security Groups**: Use cross-account SG referencing for precise control.
@@ -167,7 +167,7 @@ Frontend App Servers DB
 - Identity Source: AWS directory or external (e.g., Azure AD).
 - Permission Sets: Predefined roles reused across accounts.
 
-#### 🧑‍🤝‍🧑 Example Access Matrix
+####  Example Access Matrix
 
 | Group           | Accounts               | Access Type         |
 |-----------------|------------------------|---------------------|
@@ -252,7 +252,7 @@ You’ve got the task of putting together a Docker-based container image, which 
 
 ### a) Propose a plan how you would approach the task, gather initial requirements and nominate stakeholders
 
-#### 🧭 Understand the Objective
+####  Understand the Objective
 - Goal: Create a general-purpose, production-grade Docker base image that:
   - Is minimal and secure
   - Supports x86_64 and ARM64 architectures
@@ -260,7 +260,7 @@ You’ve got the task of putting together a Docker-based container image, which 
   - Supports common language runtimes or utilities as needed (Node.js, Python, Java, Go, etc.)
   - Ensures fast startup times, low image size, and long-term maintainability
 
-#### 👥 Identify and Engage Stakeholders
+####  Identify and Engage Stakeholders
 
 | Stakeholder             | Role / Input Required |
 |-------------------------|------------------------|
@@ -270,7 +270,7 @@ You’ve got the task of putting together a Docker-based container image, which 
 | QA/Performance Team     | Ensure image meets functional/performance benchmarks across platforms |
 | Architects              | Align with the architectural vision (e.g., OCI compliance, layering strategy) |
 
-#### 📋 Gather Initial Requirements
+####  Gather Initial Requirements
 
 **Functional Requirements:**
 - Supported OS base (e.g., Alpine, Debian Slim, or Distroless)
@@ -295,7 +295,7 @@ You’ve got the task of putting together a Docker-based container image, which 
 - Tagged by version and architecture
 - CI integration with semantic versioning
 
-#### 🛠️ High-Level Steps in the Plan
+####  High-Level Steps in the Plan
 
 1. Baseline Research: Evaluate minimal base images
 2. PoC Image Build: Build a multi-arch Dockerfile using `docker buildx`
@@ -343,33 +343,135 @@ docker buildx build --platform linux/amd64,linux/arm64 -t your-registry/php8-app
 
 ### c) Given the container image would be used in a variety of environments (locally by developers, for automated testing, beta deployments, etc.), explain how you would build, store, manage and maintain it (hint: remember it would be pulled from different locations). Provide a diagram to visualise the proposed workflow.
 
-**1. Build Strategy (Multi-Arch, CI/CD):**
-- Triggered by push/PR/semantic version tags
-- Lint, security scan, build, push
+## Container Image Lifecycle Management Strategy
 
-**2. Storage & Registry:**
-- GHCR or DockerHub for devs
-- AWS ECR for CI/CD, staging, prod
-- Signed with Cosign
+To ensure consistent, secure, and efficient usage across local development, CI/CD testing, and production deployments, here’s a streamlined workflow with a visual diagram.
 
-**3. Versioning:**
-- `:latest`, `:beta`, `:1.0.0`, `:git-sha`
+ #### 1. Workflow Overview
+Key Stages
+##### Build: Multi-arch image with versioned tags.
 
-**4. Security & Maintenance:**
-- Weekly rebuilds or on CVE patch
-- Auto PRs with Renovate
+##### Store: Central registry with access controls.
 
-**5. Environments:**
-| Environment   | Pull Source               | Notes                           |
-|---------------|---------------------------|----------------------------------|
-| Local Dev     | GHCR                      | `.env` for Redis/Postgres        |
-| CI/CD         | Internal ECR              | Tagged version builds            |
-| Beta/Prod     | Private registry          | Only signed, verified builds     |
+##### Deploy: Environment-specific pulls (dev/test/prod).
 
-**6. Monitoring & Governance:**
-- Monitor pull stats
-- Signed and labelled images
+##### Maintain: Automated updates and vulnerability scans.
 
-**Diagram** (Workflow Summary):
-- Dev → CI Build → Lint + Scan + Multi-Arch Build → Push to Registries → Pull by Devs/CI/Prod
+
+Diagram
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#### 2. Implementation Details
+##### A. Build Phase
+Tools:
+
+docker buildx: Multi-architecture builds (x86_64 + ARM64).
+
+GitHub Actions/GitLab CI: Automated pipelines.
+
+Process:
+
+Versioning: Tag images with:
+
+:latest (for dev/testing).
+
+:v1.2.3 (semantic versioning for production).
+
+Git SHA (:commit-abc123) for traceability.
+
+Multi-Arch Build Command:
+
+```
+docker buildx build --platform linux/amd64,linux/arm64 \
+  -t my-registry/php-app:latest \
+  -t my-registry/php-app:v1.0.0 \
+  --push .
+```
+##### B. Storage & Registry
+Central Registry Options:
+
+Registry	Use Case
+AWS ECR	Production workloads in AWS.
+GitHub (GHCR)	Open-source or GitHub-native teams.
+Harbor	Self-hosted with RBAC and scanning.
+Best Practices:
+
+Access Control:
+
+Developers: Read-only for :latest.
+
+CI/CD: Read/write for tagged releases.
+
+Storage Retention:
+
+Keep :latest and last 5 versions.
+
+Archive older images to cold storage (e.g., S3).
+
+##### C. Environment-Specific Pulls
+Environment	Image Tag	Pull Policy
+Local Dev	:latest	Always (fresh builds).
+Automated Tests	:commit-abc123	IfNotPresent.
+Production	:v1.2.3	Never (immutable).
+Example Kubernetes Deployment:
+
+yaml
+```
+containers:
+- name: php-app
+  image: my-registry/php-app:v1.0.0
+  imagePullPolicy: IfNotPresent
+```
+##### D. Maintenance & Security
+Automated Tools:
+
+Trivy/Clair: Scan images for CVEs in CI/CD.
+
+RenovateBot: Update base images (e.g., php:8.2-alpine).
+
+Weekly Rebuilds: Refresh :latest to patch CVEs.
+
+Rollback Plan:
+
+Pin production to immutable tags (v1.2.3).
+
+Rapid revert via Kubernetes rollback:
+
+```
+kubectl rollout undo deployment/php-app
+```
+#### 3. Key Benefits
+- Consistency: Same image runs everywhere.
+- Security: Scanned, non-root, minimal OS.
+- Scalability: Multi-arch + registry caching.
+- Traceability: Git SHA and semantic versioning.
+
+ #### 4. Potential Challenges & Mitigations
+Challenge	Solution
+Registry downtime.	Cache images in local artifact storage.
+Slow ARM64 builds.	Use Graviton runners in CI.
+CVE backlogs.	Enforce weekly rebuilds.
+Final Workflow Summary
+Developers pull :latest from a local cache (e.g., docker pull localhost:5000/php-app:latest).
+
+CI/CD builds, scans, and pushes to a central registry.
+
+Environments pull versioned images with strict policies.
+
+Security tools enforce compliance and updates.
+
+This ensures a reliable, secure, and scalable container lifecycle.
 
