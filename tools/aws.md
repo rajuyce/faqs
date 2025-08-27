@@ -36,6 +36,79 @@
    - Use AWS Transit Gateway with inter-region peering.
    - Use VPC peering or Site-to-Site VPN.
 
+10. **What are the different types of Load Balancers in AWS
+
+AWS provides **Elastic Load Balancing (ELB)**, which automatically distributes incoming traffic across multiple targets (EC2, containers, IPs, Lambda functions) within one or more Availability Zones.  
+This ensures high availability, scalability, and fault tolerance for applications.
+
+---
+
+## Types of Load Balancers in AWS
+
+### 1. Application Load Balancer (ALB)
+- **Layer:** Operates at **Layer 7 (Application Layer)**.
+- **Best for:** HTTP and HTTPS traffic with advanced routing needs.
+- **Key Features:**
+  - Path-based routing (e.g., `/api` → service A, `/images` → service B).
+  - Host-based routing (e.g., `api.example.com` → backend A, `app.example.com` → backend B).
+  - Supports **WebSockets** and **HTTP/2**.
+  - Integration with **AWS WAF** for security.
+  - Authentication with **OIDC providers** (Cognito, Okta, etc.).
+  - Can route traffic directly to **Lambda functions**.
+
+---
+
+### 2. Network Load Balancer (NLB)
+- **Layer:** Operates at **Layer 4 (Transport Layer)**.
+- **Best for:** TCP, UDP, and TLS traffic where high performance and low latency are critical.
+- **Key Features:**
+  - Handles **millions of requests per second**.
+  - Provides **static IP addresses** per Availability Zone (can attach Elastic IPs).
+  - Supports **TLS termination**.
+  - Ideal for gaming, real-time applications, IoT, or VoIP.
+  - Integrates with **AWS PrivateLink**.
+
+---
+
+### 3. Gateway Load Balancer (GWLB)
+- **Layer:** Operates at **Layer 3 (Network Layer)**.
+- **Best for:** Transparent traffic inspection and routing.
+- **Key Features:**
+  - Routes traffic to **third-party virtual appliances** (e.g., firewalls, IDS/IPS).
+  - Uses **GENEVE protocol** for encapsulation.
+  - Simplifies deployment of **inline security appliances**.
+  - Useful for **hybrid cloud and security-sensitive** environments.
+
+---
+
+### 4. Classic Load Balancer (CLB) *(Legacy)*
+- **Layer:** Supports **Layer 4 and Layer 7**, but considered legacy.
+- **Best for:** Applications built in **EC2-Classic** (deprecated).
+- **Key Features:**
+  - Basic load balancing for HTTP/HTTPS and TCP/SSL.
+  - No advanced routing (compared to ALB) or static IPs (compared to NLB).
+  - Mostly replaced by **ALB** and **NLB**.
+
+---
+
+## Comparison Table
+
+| Load Balancer Type       | OSI Layer | Protocols          | Best Use Case |
+|---------------------------|-----------|-------------------|---------------|
+| **Application LB (ALB)** | L7        | HTTP, HTTPS, WS   | Web apps, microservices, path/host-based routing |
+| **Network LB (NLB)**     | L4        | TCP, UDP, TLS     | High-performance, low-latency apps, millions of req/s |
+| **Gateway LB (GWLB)**    | L3        | IP                | Security appliances, traffic inspection |
+| **Classic LB (CLB)**     | L4 & L7   | TCP, SSL, HTTP    | Legacy applications (not recommended for new workloads) |
+
+---
+
+## ✅ Summary
+- Use **ALB** for modern web applications with smart routing.
+- Use **NLB** for ultra-high performance and static IP needs.
+- Use **GWLB** when integrating security appliances.
+- Avoid **CLB** for new deployments (use ALB or NLB instead).
+
+
 #### IAM & Roles
 10. **Can you attach multiple IAM roles to EC2 or Lambda?**
     - No. Only one IAM role can be attached per EC2 instance or Lambda function.
