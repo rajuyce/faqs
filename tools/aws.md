@@ -1,6 +1,6 @@
-### ☁️ AWS – Compute & Networking
+### ☁️ AWS 
 
-#### EC2 & Networking
+#### EC2 
 1. **Your EC2 instance is unreachable — how do you troubleshoot?**
    - Check security group rules, NACLs, and route tables.
    - Confirm instance state and system status checks.
@@ -36,16 +36,16 @@
    - Use AWS Transit Gateway with inter-region peering.
    - Use VPC peering or Site-to-Site VPN.
 
-10. **What are the different types of Load Balancers in AWS
+10. **What are the different types of Load Balancers in AWS**
 
-AWS provides **Elastic Load Balancing (ELB)**, which automatically distributes incoming traffic across multiple targets (EC2, containers, IPs, Lambda functions) within one or more Availability Zones.  
-This ensures high availability, scalability, and fault tolerance for applications.
+- AWS provides **Elastic Load Balancing (ELB)**, which automatically distributes incoming traffic across multiple targets (EC2, containers, IPs, Lambda functions) within one or more Availability Zones.  
+- This ensures high availability, scalability, and fault tolerance for applications.
 
 ---
 
-## Types of Load Balancers in AWS
+**Types of Load Balancers in AWS**
 
-### 1. Application Load Balancer (ALB)
+#### 1. Application Load Balancer (ALB)
 - **Layer:** Operates at **Layer 7 (Application Layer)**.
 - **Best for:** HTTP and HTTPS traffic with advanced routing needs.
 - **Key Features:**
@@ -58,7 +58,7 @@ This ensures high availability, scalability, and fault tolerance for application
 
 ---
 
-### 2. Network Load Balancer (NLB)
+#### 2. Network Load Balancer (NLB)
 - **Layer:** Operates at **Layer 4 (Transport Layer)**.
 - **Best for:** TCP, UDP, and TLS traffic where high performance and low latency are critical.
 - **Key Features:**
@@ -70,7 +70,7 @@ This ensures high availability, scalability, and fault tolerance for application
 
 ---
 
-### 3. Gateway Load Balancer (GWLB)
+#### 3. Gateway Load Balancer (GWLB)
 - **Layer:** Operates at **Layer 3 (Network Layer)**.
 - **Best for:** Transparent traffic inspection and routing.
 - **Key Features:**
@@ -81,7 +81,7 @@ This ensures high availability, scalability, and fault tolerance for application
 
 ---
 
-### 4. Classic Load Balancer (CLB) *(Legacy)*
+#### 4. Classic Load Balancer (CLB) *(Legacy)*
 - **Layer:** Supports **Layer 4 and Layer 7**, but considered legacy.
 - **Best for:** Applications built in **EC2-Classic** (deprecated).
 - **Key Features:**
@@ -91,7 +91,7 @@ This ensures high availability, scalability, and fault tolerance for application
 
 ---
 
-## Comparison Table
+#### Comparison Table
 
 | Load Balancer Type       | OSI Layer | Protocols          | Best Use Case |
 |---------------------------|-----------|-------------------|---------------|
@@ -102,50 +102,68 @@ This ensures high availability, scalability, and fault tolerance for application
 
 ---
 
-## ✅ Summary
+#### ✅ Summary
 - Use **ALB** for modern web applications with smart routing.
 - Use **NLB** for ultra-high performance and static IP needs.
 - Use **GWLB** when integrating security appliances.
 - Avoid **CLB** for new deployments (use ALB or NLB instead).
 
+#### Lambda
 
-#### IAM & Roles
-10. **Can you attach multiple IAM roles to EC2 or Lambda?**
-    - No. Only one IAM role can be attached per EC2 instance or Lambda function.
 
-11. **What IAM permissions does a Lambda function require?**
-    - Basic execution role: `AWSLambdaBasicExecutionRole`.
-    - Additional permissions based on services it interacts with (e.g., S3, DynamoDB).
 
-12. **What permissions does a Lambda need for basic execution?**
-    - CloudWatch Logs permissions for logging.
+1. **How do you prevent a Lambda function from accessing the internet?**
+   - Deploy it in a private subnet without a NAT Gateway or Internet Gateway.
+     
+2. **What are the different phases in AWS Lambda?**
 
----
-
-### 🌐 AWS – Storage & CDN
+#### 🌐 Storage & CDN
 
 #### S3
 
-2. **How do you make sure S3 data is not publicly accessible?**
+1. **How do you make sure S3 data is not publicly accessible?**
    - Enable S3 Block Public Access at bucket/account level.
    - Review and restrict bucket policies and ACLs.
 
-3. **How do you optimize S3 storage costs for rarely accessed data?**
+2. **How do you optimize S3 storage costs for rarely accessed data?**
    - Use storage classes like S3 Infrequent Access (IA), Glacier, or Intelligent-Tiering.
 
-4. **What is an S3 Resource Policy and how does it work?**
+3. **What is an S3 Resource Policy and how does it work?**
    - A resource-based policy attached to a bucket to define access permissions for principals.
 
-5. **An app suddenly loses access to S3. How do you debug IAM roles and policies?**
+4. **An app suddenly loses access to S3. How do you debug IAM roles and policies?**
    - Check the IAM policy simulator.
    - Validate trust relationships and resource policies.
 
-6. **How do you serve a static website with HTTPS using S3?**
+5. **How do you serve a static website with HTTPS using S3?**
    - Host site in S3, use CloudFront with a custom domain and ACM-issued SSL certificate.
 
 ---
 
-### 🔐 AWS – Security & Compliance
+#### Networking
+
+1. **What are the different types of network security services in AWS?**
+   - Security Groups, NACLs, AWS WAF, AWS Shield, Network Firewall, PrivateLink.
+
+2. **What are network firewalls in AWS, and how do you use them?**
+   - AWS Network Firewall is a managed service to deploy stateful inspection rules at the VPC level.
+
+
+#### IAM 
+
+1. **Can you attach multiple IAM roles to EC2 or Lambda?**
+    - No. Only one IAM role can be attached per EC2 instance or Lambda function.
+
+2. **What IAM permissions does a Lambda function require?**
+    - Basic execution role: `AWSLambdaBasicExecutionRole`.
+    - Additional permissions based on services it interacts with (e.g., S3, DynamoDB).
+
+3. **What permissions does a Lambda need for basic execution?**
+    - CloudWatch Logs permissions for logging.
+
+---
+
+### 🔐 Security & Compliance
 
 #### IAM & Secrets
 1. **How do you securely store and manage secrets in AWS?**
@@ -157,31 +175,21 @@ This ensures high availability, scalability, and fault tolerance for application
 3. **What is a Service Control Policy (SCP) in AWS Organizations?**
    - Policy type that sets permission boundaries for accounts in an organization.
 
-#### Network Security
-4. **What are the different types of network security services in AWS?**
-   - Security Groups, NACLs, AWS WAF, AWS Shield, Network Firewall, PrivateLink.
-
-5. **What are network firewalls in AWS and how do you use them?**
-   - AWS Network Firewall is a managed service to deploy stateful inspection rules at the VPC level.
-
-6. **How do you prevent a Lambda function from accessing the internet?**
-   - Deploy it in a private subnet without a NAT Gateway or Internet Gateway.
-
 #### Cost & Access Monitoring
-7. **Your AWS bill suddenly spikes. How do you investigate and control it?**
+1. **Your AWS bill suddenly spikes. How do you investigate and control it?**
    - Use AWS Cost Explorer and Budgets.
    - Enable detailed billing reports and check CloudWatch for resource usage.
    - Set up billing alerts.
 
 ---
 
-### 📡 AWS – Connectivity & Access
+#### 📡 Connectivity & Access
 1. **What is a VPC Endpoint and in what cases do you use it?**
    - Enables private connection to AWS services without internet. Used for secure S3, DynamoDB, etc., access from VPC.
 
 ---
 
-### 📊 AWS – Monitoring & Cost Optimization
+#### 📊 Monitoring & Cost Optimization
 1. **How do you monitor EC2 or Lambda performance and set alerts?**
    - Use CloudWatch metrics and alarms.
    - For EC2: CPU, memory, disk via CloudWatch Agent.
@@ -197,7 +205,7 @@ This ensures high availability, scalability, and fault tolerance for application
 
 ---
 
-### 🌀 AWS – Deployment & Automation
+#### 🌀 AWS – Deployment & Automation
 1. **How do you implement blue-green deployments in AWS?**
    - Use CodeDeploy with EC2, Lambda, or ECS.
    - Use weighted routing with Route 53 or ALB.
@@ -220,7 +228,7 @@ This ensures high availability, scalability, and fault tolerance for application
 
 ---
 
-###  AWS – AI & ML Services
+####  AWS – AI & ML Services
 1. **What generative AI tools are available in AWS (e.g., Bedrock, SageMaker)?**
    - Bedrock for foundation models from Anthropic, Meta, etc.
    - SageMaker for custom ML models and pipelines.
@@ -231,7 +239,7 @@ This ensures high availability, scalability, and fault tolerance for application
 
 ---
 
-### 🏗️ AWS – Landing Zone
+#### 🏗️ AWS – Landing Zone
 1. **What is AWS Landing Zone and what are its key components?**
    - Pre-configured baseline with multi-account architecture, guardrails, logging, and security controls.
 
@@ -254,7 +262,7 @@ This ensures high availability, scalability, and fault tolerance for application
 
 ---
 
-### 🧭 AWS – Control Tower
+#### 🧭 AWS – Control Tower
 1. **What is AWS Control Tower and how is it different from manually setting up a Landing Zone?**
    - Automated setup of multi-account environments with guardrails and baselines.
 
@@ -275,7 +283,7 @@ This ensures high availability, scalability, and fault tolerance for application
 
 ---
 
-### 🧰 AWS – Account Factory
+#### 🧰 AWS – Account Factory
 1. **What is AWS Account Factory and how does it work within Control Tower?**
    - Automated account provisioning system within Control Tower.
 
