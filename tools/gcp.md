@@ -105,10 +105,9 @@
 
 ---
 
-## GCP Serverless:
+### GCP Serverless:
 
-### Difference between Cloud Run and Cloud Functions
+**Difference between Cloud Run and Cloud Functions
 
-## GCP Storage:
-
-### Different types of Buckets in Google Cloud Storage
+### GCP Storage:
+**Different types of Buckets in Google Cloud Storage
