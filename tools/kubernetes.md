@@ -183,11 +183,19 @@
 ### Issues you identified in deployment times
 ### Resolutions implemented to fix them
 ### Which command is used to describe pod status?
-### What is the use of Namespace in Kubernetes
+### What is the use of a namespace in Kubernetes
 
 ## Kubernetes Troubleshooting:
 
 ### Difference between CrashLoopBackOff and ImagePullBackOff
 ### Reasons for CrashLoopBackOff
 ### Different types of Probes
+
+## Kubernetes / GKE Services:
+
+### Different types of Services in GKE/Kubernetes
+### NodePort IP/port range
+### Different types of Load Balancers
+### Difference between Load Balancer and Ingress
+### Which is best: Load Balancer or Ingress?
 
