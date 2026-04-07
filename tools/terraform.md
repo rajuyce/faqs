@@ -200,3 +200,11 @@ resource "aws_instance" "example" {
   - RBAC and team management
   - Sentinel policies for governance
   - Integrated state management and VCS support
+ 
+### Major use of Terraform Lint
+### What is Terraform Drift
+### What is Terraform Taint
+### What is for_each in Terraform
+### What is count in Terraform
+### Difference between for_each and count in Terraform
+
