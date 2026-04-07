@@ -176,3 +176,18 @@
 
 44. **How do you scan container images for vulnerabilities in your pipeline?**  
     Use tools like Trivy, Clair, or Aqua integrated into CI pipelines.
+
+
+### What is a DaemonSet?
+### What are Taints and Tolerations?
+### Issues you identified in deployment times
+### Resolutions implemented to fix them
+### Which command is used to describe pod status?
+### What is the use of Namespace in Kubernetes
+
+## Kubernetes Troubleshooting:
+
+### Difference between CrashLoopBackOff and ImagePullBackOff
+### Reasons for CrashLoopBackOff
+### Different types of Probes
+
