@@ -104,3 +104,11 @@
    - Serverless orchestration of services and APIs.
 
 ---
+
+## GCP Serverless:
+
+### Difference between Cloud Run and Cloud Functions
+
+## GCP Storage:
+
+### Different types of Buckets in Google Cloud Storage
